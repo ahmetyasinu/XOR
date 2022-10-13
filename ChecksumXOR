@@ -1,0 +1,69 @@
+public String CalculateCheckSum(String veri)
+        {
+            
+
+            try
+            {
+               
+                String str = veri;
+                
+                Encoding iso = Encoding.GetEncoding("ISO-8859-9");
+                Encoding utf8 = Encoding.UTF8;
+                byte[] utfBytes = utf8.GetBytes(str);
+                byte[] dataByte = Encoding.Convert(utf8, iso, utfBytes);
+               
+                int xorVal = xorDatas(dataByte);
+                int xorHigh = (((byte)xorVal >> 4) & (byte)0x0F);
+                int xorLow = ((byte)xorVal & (byte)0x0F);
+                if (xorHigh < 0x0A)
+                {
+                    xorHigh = (byte)((byte)xorHigh + (byte)0x30);
+                }
+                else
+                {
+                    xorHigh = (byte)((byte)xorHigh + (byte)0x37);
+                }
+                if (xorLow < 0x0A)
+                {
+                    xorLow = (byte)((byte)xorLow + (byte)0x30);
+                }
+                else
+                {
+                    xorLow = (byte)((byte)xorLow + (byte)0x37);
+                }
+                int newDatasLenght = dataByte.Length + 5;
+                byte[] newDatas = new byte[newDatasLenght];
+                newDatas[0] = 2;
+                for (int i = 0; i < dataByte.Length; i++)
+                {
+                    newDatas[i + 1] = dataByte[i];
+                }
+                newDatas[dataByte.Length + 1] = 5;
+                newDatas[dataByte.Length + 2] = (byte)xorHigh;
+                newDatas[dataByte.Length + 3] = (byte)xorLow;
+                newDatas[dataByte.Length + 4] = 3;
+               
+
+                veri = System.Text.Encoding.UTF8.GetString(newDatas, 0, newDatas.Length);
+               
+
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.StackTrace);
+            }
+
+             return veri;
+        }
+
+        private int xorDatas(byte[] data)
+        {
+            int temp = data[0];
+            for (int i = 1; i < data.Length; i++)
+            {
+                temp = temp ^ data[i];
+            }
+            return temp;
+        }
+
